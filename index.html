@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Performance Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f8f9fa;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+    .form-section, .dashboard {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 My Performance Tracker</h1>
+
+    <!-- Teaching Form -->
+    <div class="form-section">
+      <h2>Teaching Activity</h2>
+      <label>Course Name:</label>
+      <input type="text" id="course" />
+      <label>Semester:</label>
+      <input type="text" id="semester" />
+      <label>Students Count:</label>
+      <input type="number" id="students" />
+      <label>Marks for this Activity:</label>
+      <input type="number" id="teachingMarks" />
+      <button onclick="saveTeaching()">Save Teaching Activity</button>
+    </div>
+
+    <!-- Research Form -->
+    <div class="form-section">
+      <h2>Research Publication</h2>
+      <label>Title:</label>
+      <input type="text" id="title" />
+      <label>Type:</label>
+      <select id="type">
+        <option>Journal</option>
+        <option>Conference</option>
+      </select>
+      <label>Year:</label>
+      <input type="number" id="year" />
+      <label>Marks for this Publication:</label>
+      <input type="number" id="researchMarks" />
+      <button onclick="saveResearch()">Save Research</button>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+      <h2>Dashboard</h2>
+      <canvas id="myChart"></canvas>
+      <p id="summary"></p>
+    </div>
+  </div>
+
+  <script>
+    let teachingData = [];
+    let researchData = [];
+
+    function saveTeaching(){
+      let course = document.getElementById('course').value;
+      let semester = document.getElementById('semester').value;
+      let students = parseInt(document.getElementById('students').value);
+      let marks = parseInt(document.getElementById('teachingMarks').value);
+      if(course && semester && students && marks){
+        teachingData.push({course, semester, students, marks});
+        alert('Teaching Activity Saved!');
+        updateDashboard();
+      }
+    }
+
+    function saveResearch(){
+      let title = document.getElementById('title').value;
+      let type = document.getElementById('type').value;
+      let year = parseInt(document.getElementById('year').value);
+      let marks = parseInt(document.getElementById('researchMarks').value);
+      if(title && type && year && marks){
+        researchData.push({title, type, year, marks});
+        alert('Research Publication Saved!');
+        updateDashboard();
+      }
+    }
+
+    function updateDashboard(){
+      let totalTeaching = teachingData.length;
+      let totalStudents = teachingData.reduce((sum, t) => sum + t.students, 0);
+      let teachingMarks = teachingData.reduce((sum, t) => sum + t.marks, 0);
+
+      let totalResearch = researchData.length;
+      let researchMarks = researchData.reduce((sum, r) => sum + r.marks, 0);
+
+      document.getElementById('summary').innerText = `Teaching: ${totalTeaching} courses, ${totalStudents} students, ${teachingMarks} marks | Research: ${totalResearch} publications, ${researchMarks} marks`;
+
+      let ctx = document.getElementById('myChart').getContext('2d');
+      if(window.myChartInstance){
+        window.myChartInstance.destroy();
+      }
+      window.myChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Teaching Activities', 'Teaching Marks', 'Students', 'Research Publications', 'Research Marks'],
+          datasets: [{
+            label: 'Performance Data',
+            data: [totalTeaching, teachingMarks, totalStudents, totalResearch, researchMarks],
+            backgroundColor: ['#007bff','#17a2b8','#28a745','#ffc107','#6f42c1']
+          }]
+        }
+      });
+    }
+  </script>
+</body>
+</html>
